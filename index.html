@@ -1,0 +1,1701 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a1a2e">
+<title>NekoLogy - 猫成分解析</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --pink: #FF6B9D;
+  --pink-light: #FFB3D0;
+  --orange: #FF9A56;
+  --yellow: #FFD93D;
+  --mint: #6BCB77;
+  --sky: #4FC3F7;
+  --purple: #AB83E6;
+  --lavender: #D4A5FF;
+  --bg: #FFF5F7;
+  --card: #FFFFFF;
+  --text: #2D2B3D;
+  --text-light: #8B87A0;
+  --shadow: 0 4px 20px rgba(255,107,157,0.15);
+  --shadow-lg: 0 8px 32px rgba(255,107,157,0.2);
+  --radius: 20px;
+  --radius-sm: 14px;
+  --transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { 
+  height: 100%; 
+  overflow: hidden;
+  font-family: 'Zen Maru Gothic', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.screen {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: none;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  background: var(--bg);
+}
+.screen.active { display: flex; }
+.screen.fade-in { animation: fadeIn 0.4s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+/* ===== SPLASH ===== */
+#splash {
+  background: #1a1a2e;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+.splash-cat {
+  position: relative;
+  width: 180px;
+  height: 180px;
+}
+.cat-silhouette {
+  width: 100%;
+  height: 100%;
+}
+.cat-eyes {
+  position: absolute;
+  top: 55px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 30px;
+}
+.cat-eye {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #FFD93D;
+  box-shadow: 0 0 20px #FFD93D, 0 0 40px rgba(255,217,61,0.4);
+  animation: eyeGlow 3s ease-in-out infinite;
+}
+.cat-eye:nth-child(2) { animation-delay: 0.2s; }
+@keyframes eyeGlow {
+  0%,100% { opacity: 0.4; transform: scale(0.8); box-shadow: 0 0 10px #FFD93D; }
+  50% { opacity: 1; transform: scale(1.1); box-shadow: 0 0 30px #FFD93D, 0 0 60px rgba(255,217,61,0.5); }
+}
+.splash-logo {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 42px;
+  font-weight: 700;
+  color: white;
+  margin-top: 24px;
+  letter-spacing: 3px;
+  text-shadow: 0 0 30px rgba(255,107,157,0.6);
+  animation: logoFloat 4s ease-in-out infinite;
+}
+@keyframes logoFloat {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.splash-sub {
+  color: rgba(255,255,255,0.5);
+  font-size: 13px;
+  margin-top: 10px;
+  letter-spacing: 1px;
+}
+.splash-tap {
+  color: rgba(255,255,255,0.4);
+  font-size: 12px;
+  margin-top: 50px;
+  animation: tapPulse 2s ease-in-out infinite;
+}
+@keyframes tapPulse {
+  0%,100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+}
+
+/* ===== HEADER ===== */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 10px;
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 10;
+}
+.header-logo {
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  background: linear-gradient(135deg, var(--pink), var(--orange));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.header-icons { display: flex; gap: 8px; }
+.header-icon {
+  width: 36px; height: 36px;
+  border-radius: 12px;
+  border: none;
+  background: white;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.header-icon:active { transform: scale(0.9); }
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--pink);
+  font-weight: 700;
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+/* ===== HOME ===== */
+.home-content { padding: 0 20px 100px; }
+
+.daily-cat-card {
+  background: linear-gradient(135deg, #FFE0EC, #FFF0E0, #E0F0FF);
+  border-radius: var(--radius);
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+.daily-cat-card::before {
+  content: '';
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 100px; height: 100px;
+  background: rgba(255,107,157,0.1);
+  border-radius: 50%;
+}
+.daily-label {
+  font-size: 13px;
+  color: var(--text-light);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.daily-cat-emoji {
+  font-size: 64px;
+  display: block;
+  margin: 8px 0;
+  animation: catBounce 3s ease-in-out infinite;
+}
+@keyframes catBounce {
+  0%,100% { transform: translateY(0) rotate(-2deg); }
+  25% { transform: translateY(-8px) rotate(2deg); }
+  75% { transform: translateY(-4px) rotate(-1deg); }
+}
+.daily-cat-name {
+  font-size: 20px;
+  font-weight: 900;
+  margin: 4px 0;
+}
+.daily-cat-desc {
+  font-size: 13px;
+  color: var(--text-light);
+}
+
+.streak-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: white;
+  border-radius: 30px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: var(--shadow);
+  margin: 12px 0;
+  color: var(--orange);
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+.menu-card {
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  padding: 20px 16px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: var(--transition);
+  border: 2px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+.menu-card:active { transform: scale(0.95); }
+.menu-card:nth-child(1) { border-color: var(--pink-light); }
+.menu-card:nth-child(2) { border-color: #B3E5C7; }
+.menu-card:nth-child(3) { border-color: #B3D4FF; }
+.menu-card:nth-child(4) { border-color: #FFD9B3; }
+.menu-card .mc-emoji {
+  font-size: 32px;
+  display: block;
+  margin-bottom: 8px;
+}
+.menu-card .mc-title {
+  font-size: 14px;
+  font-weight: 900;
+}
+.menu-card .mc-sub {
+  font-size: 11px;
+  color: var(--text-light);
+  margin-top: 4px;
+}
+.menu-card .mc-badge {
+  position: absolute;
+  top: 8px; right: 8px;
+  background: var(--pink);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* ===== TAB BAR ===== */
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 430px;
+  display: flex;
+  background: white;
+  border-top: 1px solid rgba(0,0,0,0.05);
+  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+  z-index: 100;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+}
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 10px;
+  color: var(--text-light);
+  cursor: pointer;
+  padding: 4px 0;
+  transition: var(--transition);
+}
+.tab-item.active { color: var(--pink); }
+.tab-item .tab-icon { font-size: 22px; }
+.tab-item.active .tab-icon { transform: scale(1.15); }
+
+/* ===== DIAGNOSIS SELECT ===== */
+.diag-select-content { padding: 0 20px 100px; }
+.diag-option {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-left: 5px solid;
+}
+.diag-option:active { transform: scale(0.97); }
+.diag-option:nth-child(1) { border-left-color: var(--pink); }
+.diag-option:nth-child(2) { border-left-color: var(--sky); }
+.diag-option:nth-child(3) { border-left-color: var(--yellow); }
+.diag-option .do-emoji { font-size: 40px; }
+.diag-option .do-title { font-size: 16px; font-weight: 900; }
+.diag-option .do-desc { font-size: 12px; color: var(--text-light); margin-top: 4px; }
+.diag-option .do-badge {
+  margin-top: 6px;
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: #FFF0F5;
+  color: var(--pink);
+}
+
+/* ===== QUIZ ===== */
+.quiz-content { padding: 0 20px 40px; flex: 1; display: flex; flex-direction: column; }
+.quiz-progress {
+  display: flex;
+  gap: 6px;
+  margin: 10px 0 20px;
+}
+.quiz-dot {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: #EEE;
+  transition: background 0.3s;
+}
+.quiz-dot.done { background: linear-gradient(90deg, var(--pink), var(--orange)); }
+.quiz-dot.current { background: var(--yellow); animation: dotPulse 1s ease-in-out infinite; }
+@keyframes dotPulse { 0%,100%{opacity:0.6} 50%{opacity:1} }
+
+.quiz-qnum {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--pink);
+  margin-bottom: 6px;
+}
+.quiz-question {
+  font-size: 19px;
+  font-weight: 900;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+.quiz-options { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.quiz-opt {
+  background: var(--card);
+  border: 2px solid #F0EEF5;
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.quiz-opt:active { transform: scale(0.97); }
+.quiz-opt.selected {
+  border-color: var(--pink);
+  background: #FFF0F5;
+  transform: scale(1.02);
+}
+.quiz-opt .opt-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: #F5F3FA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-light);
+  flex-shrink: 0;
+}
+.quiz-opt.selected .opt-num {
+  background: var(--pink);
+  color: white;
+}
+
+/* ===== RESULT ===== */
+.result-content {
+  padding: 0 20px 40px;
+  text-align: center;
+}
+.result-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 32px 24px;
+  box-shadow: var(--shadow-lg);
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.result-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, var(--pink), var(--orange), var(--yellow), var(--mint), var(--sky), var(--purple));
+}
+.result-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-light);
+  margin-bottom: 10px;
+}
+.result-emoji {
+  font-size: 80px;
+  display: block;
+  margin: 10px 0;
+  animation: resultPop 0.6s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes resultPop { from { transform: scale(0) rotate(-20deg); } to { transform: scale(1) rotate(0); } }
+.result-name {
+  font-size: 26px;
+  font-weight: 900;
+  margin: 8px 0;
+}
+.result-tags {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 10px 0;
+}
+.result-tag {
+  background: #FFF0F5;
+  color: var(--pink);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+.result-desc {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text);
+  margin-top: 16px;
+  text-align: left;
+  padding: 16px;
+  background: #FAFAFE;
+  border-radius: var(--radius-sm);
+}
+.result-bars {
+  margin-top: 16px;
+  text-align: left;
+}
+.bar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.bar-label {
+  font-size: 12px;
+  font-weight: 700;
+  width: 90px;
+  flex-shrink: 0;
+}
+.bar-track {
+  flex: 1;
+  height: 12px;
+  background: #F0EEF5;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 1s cubic-bezier(0.34,1.56,0.64,1);
+  width: 0;
+}
+.bar-pct {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-light);
+  width: 36px;
+  text-align: right;
+}
+
+.action-btn {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  margin-top: 10px;
+}
+.action-btn:active { transform: scale(0.97); }
+.btn-primary {
+  background: linear-gradient(135deg, var(--pink), var(--orange));
+  color: white;
+  box-shadow: 0 4px 15px rgba(255,107,157,0.3);
+}
+.btn-secondary {
+  background: white;
+  color: var(--pink);
+  border: 2px solid var(--pink-light);
+}
+.btn-accent {
+  background: linear-gradient(135deg, var(--sky), var(--purple));
+  color: white;
+  box-shadow: 0 4px 15px rgba(79,195,247,0.3);
+}
+
+/* ===== COMPATIBILITY ===== */
+.compat-hearts {
+  font-size: 40px;
+  margin: 10px 0;
+  animation: heartBeat 1.5s ease-in-out infinite;
+}
+@keyframes heartBeat {
+  0%,100% { transform: scale(1); }
+  15% { transform: scale(1.15); }
+  30% { transform: scale(1); }
+  45% { transform: scale(1.1); }
+}
+.compat-pair {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin: 16px 0;
+}
+.compat-cat {
+  text-align: center;
+}
+.compat-cat-emoji { font-size: 48px; display: block; }
+.compat-cat-name { font-size: 12px; font-weight: 700; margin-top: 4px; }
+.compat-x { font-size: 24px; color: var(--pink); font-weight: 900; }
+.compat-score {
+  font-size: 52px;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--pink), var(--orange));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.compat-msg {
+  font-size: 14px;
+  line-height: 1.8;
+  text-align: left;
+  padding: 16px;
+  background: linear-gradient(135deg, #FFF5F8, #F5F0FF);
+  border-radius: var(--radius-sm);
+  margin-top: 16px;
+}
+
+/* ===== NEKO LOG ===== */
+.log-content { padding: 0 20px 100px; }
+.log-date {
+  font-size: 14px;
+  color: var(--text-light);
+  font-weight: 700;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.log-checks { display: flex; flex-direction: column; gap: 8px; }
+.log-check {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: var(--transition);
+  border: 2px solid transparent;
+}
+.log-check.checked { border-color: var(--mint); background: #F0FFF4; }
+.log-check:active { transform: scale(0.98); }
+.log-checkbox {
+  width: 26px; height: 26px;
+  border-radius: 8px;
+  border: 2px solid #DDD;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: var(--transition);
+}
+.log-check.checked .log-checkbox {
+  background: var(--mint);
+  border-color: var(--mint);
+  color: white;
+}
+.log-check-text { font-size: 14px; font-weight: 500; }
+.log-check-emoji { font-size: 20px; }
+
+.log-result-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: var(--shadow);
+}
+.log-result-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--pink);
+}
+
+/* ===== NEKOGRAM ===== */
+.gram-content { padding: 0 20px 100px; }
+.gram-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+}
+.gram-title { font-size: 16px; font-weight: 900; margin-bottom: 16px; }
+.chart-container {
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 16px;
+  position: relative;
+}
+.chart-canvas { width: 100%; height: 100%; }
+.chart-center {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  text-align: center;
+}
+.chart-center-emoji { font-size: 28px; }
+.chart-center-pct { font-size: 12px; font-weight: 700; color: var(--text-light); }
+
+.gram-legend { display: flex; flex-direction: column; gap: 8px; }
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.legend-dot {
+  width: 14px; height: 14px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.legend-name { flex: 1; }
+.legend-pct { font-weight: 700; }
+
+.gram-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.gram-tab {
+  flex: 1;
+  padding: 8px;
+  border: 2px solid #F0EEF5;
+  border-radius: 10px;
+  background: white;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.gram-tab.active {
+  border-color: var(--pink);
+  background: #FFF0F5;
+  color: var(--pink);
+}
+
+.top-cats { margin-top: 12px; }
+.top-cat-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #F5F3FA;
+}
+.top-cat-rank {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 900;
+  color: white;
+}
+.top-cat-rank.r1 { background: var(--yellow); }
+.top-cat-rank.r2 { background: #C0C0C0; }
+.top-cat-rank.r3 { background: #CD7F32; }
+.top-cat-emoji { font-size: 24px; }
+.top-cat-name { flex: 1; font-size: 14px; font-weight: 700; }
+.top-cat-paws { font-size: 14px; letter-spacing: 2px; }
+
+/* ===== ACHIEVEMENTS ===== */
+.achiev-content { padding: 0 20px 100px; }
+.achiev-summary {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: var(--text-light);
+  font-weight: 700;
+}
+.achiev-list { display: flex; flex-direction: column; gap: 10px; }
+.achiev-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--card);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+}
+.achiev-item.locked { opacity: 0.5; filter: grayscale(0.7); }
+.achiev-icon { font-size: 32px; }
+.achiev-info { flex: 1; }
+.achiev-name { font-size: 14px; font-weight: 900; }
+.achiev-cond { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+.achiev-status {
+  font-size: 20px;
+}
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100px);
+  background: var(--text);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-size: 14px;
+  font-weight: 700;
+  z-index: 999;
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  white-space: nowrap;
+  box-shadow: var(--shadow-lg);
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-light);
+}
+.empty-emoji { font-size: 48px; margin-bottom: 12px; }
+.empty-text { font-size: 14px; font-weight: 500; line-height: 1.6; }
+
+/* ===== CONFETTI ===== */
+.confetti-container {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 200;
+}
+.confetti-piece {
+  position: absolute;
+  width: 10px; height: 10px;
+  top: -10px;
+  animation: confettiFall 3s linear forwards;
+}
+@keyframes confettiFall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* ===== SCROLLBAR ===== */
+.screen::-webkit-scrollbar { width: 0; }
+
+/* ===== DECORATIVE PAWS ===== */
+.paw-bg {
+  position: fixed;
+  font-size: 100px;
+  opacity: 0.03;
+  z-index: 0;
+  pointer-events: none;
+}
+.paw-bg.p1 { top: 10%; right: -20px; transform: rotate(25deg); }
+.paw-bg.p2 { bottom: 20%; left: -20px; transform: rotate(-15deg); }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="paw-bg p1">🐾</div>
+  <div class="paw-bg p2">🐾</div>
+
+  <!-- SPLASH -->
+  <div id="splash" class="screen active" onclick="startApp()">
+    <div class="splash-cat">
+      <svg class="cat-silhouette" viewBox="0 0 200 200" fill="#2a2a4e">
+        <path d="M40,180 Q30,140 25,120 Q20,80 40,60 L50,30 Q55,25 60,35 L65,55 Q80,45 100,42 Q120,45 135,55 L140,35 Q145,25 150,30 L160,60 Q180,80 175,120 Q170,140 160,180 Z"/>
+      </svg>
+      <div class="cat-eyes">
+        <div class="cat-eye"></div>
+        <div class="cat-eye"></div>
+      </div>
+    </div>
+    <div class="splash-logo">NekoLogy</div>
+    <div class="splash-sub">猫成分解析アプリ</div>
+    <div class="splash-tap">タップしてスタート 🐾</div>
+  </div>
+
+  <!-- HOME -->
+  <div id="home" class="screen">
+    <div class="header">
+      <div class="header-logo">🐾 NekoLogy</div>
+      <div class="header-icons">
+        <button class="header-icon" onclick="showScreen('achievements')">🏆</button>
+      </div>
+    </div>
+    <div class="home-content">
+      <div class="daily-cat-card">
+        <div class="daily-label">📅 本日の猫成分</div>
+        <div class="daily-cat-emoji" id="dailyCatEmoji">🐱</div>
+        <div class="daily-cat-name" id="dailyCatName">まだ診断していません</div>
+        <div class="daily-cat-desc" id="dailyCatDesc">診断して猫成分を解析しよう！</div>
+      </div>
+      <div id="streakBadge" class="streak-badge" style="display:none">
+        🔥 <span id="streakCount">0</span>日連続ログ中！
+      </div>
+      <div class="menu-grid">
+        <div class="menu-card" onclick="showScreen('diagSelect')">
+          <span class="mc-emoji">🎯</span>
+          <div class="mc-title">診断する</div>
+          <div class="mc-sub">猫との相性は？</div>
+        </div>
+        <div class="menu-card" onclick="showScreen('nekoLog')">
+          <span class="mc-emoji">📖</span>
+          <div class="mc-title">ネコログ</div>
+          <div class="mc-sub">今日の猫行動</div>
+        </div>
+        <div class="menu-card" onclick="showScreen('nekogram')">
+          <span class="mc-emoji">📊</span>
+          <div class="mc-title">ネコグラム</div>
+          <div class="mc-sub">猫成分の推移</div>
+        </div>
+        <div class="menu-card" onclick="showScreen('achievements')">
+          <span class="mc-emoji">🏆</span>
+          <div class="mc-title">実績</div>
+          <div class="mc-sub" id="achievCount">0/8 解除</div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-bar">
+      <button class="tab-item active" onclick="showScreen('home')"><span class="tab-icon">🏠</span>ホーム</button>
+      <button class="tab-item" onclick="showScreen('diagSelect')"><span class="tab-icon">🎯</span>診断</button>
+      <button class="tab-item" onclick="showScreen('nekoLog')"><span class="tab-icon">📖</span>ログ</button>
+      <button class="tab-item" onclick="showScreen('nekogram')"><span class="tab-icon">📊</span>分析</button>
+      <button class="tab-item" onclick="showScreen('achievements')"><span class="tab-icon">🏆</span>実績</button>
+    </div>
+  </div>
+
+  <!-- DIAG SELECT -->
+  <div id="diagSelect" class="screen">
+    <div class="header">
+      <button class="back-btn" onclick="showScreen('home')">← もどる</button>
+    </div>
+    <div class="diag-select-content">
+      <div class="diag-option" onclick="startQuiz('want')">
+        <span class="do-emoji">😻</span>
+        <div>
+          <div class="do-title">飼いたい猫診断</div>
+          <div class="do-desc">あなたにぴったりの猫種を見つけよう</div>
+          <div class="do-badge">4択 × 6問</div>
+        </div>
+      </div>
+      <div class="diag-option" onclick="startQuiz('become')">
+        <span class="do-emoji">🐈‍⬛</span>
+        <div>
+          <div class="do-title">なる猫診断</div>
+          <div class="do-desc">あなたが猫になったら何猫？</div>
+          <div class="do-badge">4択 × 6問</div>
+        </div>
+      </div>
+      <div class="diag-option" id="compatOption" onclick="startCompat()" style="display:none">
+        <span class="do-emoji">💞</span>
+        <div>
+          <div class="do-title">相性診断</div>
+          <div class="do-desc">飼いたい猫 × なる猫の相性は？</div>
+          <div class="do-badge">結果を使って解析</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz" class="screen">
+    <div class="header">
+      <button class="back-btn" onclick="showScreen('diagSelect')">← やめる</button>
+    </div>
+    <div class="quiz-content">
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div class="quiz-qnum" id="quizQnum"></div>
+      <div class="quiz-question" id="quizQuestion"></div>
+      <div class="quiz-options" id="quizOptions"></div>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result" class="screen">
+    <div class="header">
+      <button class="back-btn" onclick="showScreen('home')">← ホームへ</button>
+    </div>
+    <div class="result-content" id="resultContent"></div>
+  </div>
+
+  <!-- COMPATIBILITY -->
+  <div id="compat" class="screen">
+    <div class="header">
+      <button class="back-btn" onclick="showScreen('home')">← ホームへ</button>
+    </div>
+    <div class="result-content" id="compatContent"></div>
+  </div>
+
+  <!-- NEKO LOG -->
+  <div id="nekoLog" class="screen">
+    <div class="header">
+      <button class="back-btn" onclick="showScreen('home')">← もどる</button>
+      <div style="font-weight:900;font-size:16px">📖 ネコログ</div>
+      <div style="width:60px"></div>
+    </div>
+    <div class="log-content" id="logContent"></div>
+    <div class="tab-bar">
+      <button class="tab-item" onclick="showScreen('home')"><span class="tab-icon">🏠</span>ホーム</button>
+      <button class="tab-item" onclick="showScreen('diagSelect')"><span class="tab-icon">🎯</span>診断</button>
+      <button class="tab-item active" onclick="showScreen('nekoLog')"><span class="tab-icon">📖</span>ログ</button>
+      <button class="tab-item" onclick="showScreen('nekogram')"><span class="tab-icon">📊</span>分析</button>
+      <button class="tab-item" onclick="showScreen('achievements')"><span class="tab-icon">🏆</span>実績</button>
+    </div>
+  </div>
+
+  <!-- NEKOGRAM -->
+  <div id="nekogram" class="screen">
+    <div class="header">
+      <button class="back-btn" onclick="showScreen('home')">← もどる</button>
+      <div style="font-weight:900;font-size:16px">📊 マイネコグラム</div>
+      <div style="width:60px"></div>
+    </div>
+    <div class="gram-content" id="gramContent"></div>
+    <div class="tab-bar">
+      <button class="tab-item" onclick="showScreen('home')"><span class="tab-icon">🏠</span>ホーム</button>
+      <button class="tab-item" onclick="showScreen('diagSelect')"><span class="tab-icon">🎯</span>診断</button>
+      <button class="tab-item" onclick="showScreen('nekoLog')"><span class="tab-icon">📖</span>ログ</button>
+      <button class="tab-item active" onclick="showScreen('nekogram')"><span class="tab-icon">📊</span>分析</button>
+      <button class="tab-item" onclick="showScreen('achievements')"><span class="tab-icon">🏆</span>実績</button>
+    </div>
+  </div>
+
+  <!-- ACHIEVEMENTS -->
+  <div id="achievements" class="screen">
+    <div class="header">
+      <button class="back-btn" onclick="showScreen('home')">← もどる</button>
+      <div style="font-weight:900;font-size:16px">🏆 実績</div>
+      <div style="width:60px"></div>
+    </div>
+    <div class="achiev-content" id="achievContent"></div>
+    <div class="tab-bar">
+      <button class="tab-item" onclick="showScreen('home')"><span class="tab-icon">🏠</span>ホーム</button>
+      <button class="tab-item" onclick="showScreen('diagSelect')"><span class="tab-icon">🎯</span>診断</button>
+      <button class="tab-item" onclick="showScreen('nekoLog')"><span class="tab-icon">📖</span>ログ</button>
+      <button class="tab-item" onclick="showScreen('nekogram')"><span class="tab-icon">📊</span>分析</button>
+      <button class="tab-item active" onclick="showScreen('achievements')"><span class="tab-icon">🏆</span>実績</button>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+// ===== DATA =====
+const CAT_BREEDS = {
+  want: [
+    { id:"scottish", name:"スコティッシュフォールド", emoji:"😺", tags:["癒し","まったり","室内"], color:"#FFB3D0",
+      desc:"折れ耳が愛らしい、まったり癒し系。あなたの隣でゴロゴロ言いながら、穏やかな時間を一緒に過ごしてくれるでしょう。甘えん坊だけど、程よい距離感を保てる大人な猫です。" },
+    { id:"munchkin", name:"マンチカン", emoji:"😸", tags:["遊び好き","子猫感","短足"], color:"#FFD93D",
+      desc:"短い脚でちょこちょこ走る姿は反則級の可愛さ！好奇心旺盛で、あなたの毎日に笑顔と活力を与えてくれます。おもちゃ遊びが大好きな永遠の子猫です。" },
+    { id:"abyssinian", name:"アビシニアン", emoji:"🐱", tags:["知的","活発","ツンデレ"], color:"#AB83E6",
+      desc:"美しい毛並みと知的な眼差し。独立心がありながらも、信頼した人にはとことん甘える究極のツンデレ猫。一緒に暮らすほどに深まる関係を楽しめます。" },
+    { id:"mix", name:"雑種（ミケ）", emoji:"🐈", tags:["個性派","一期一会","普通が最高"], color:"#6BCB77",
+      desc:"世界にたった一匹の、あなただけの猫。個性豊かで予測不能な魅力にあふれています。特別な血統じゃなくても、あなたとの出会いが特別なんです。" },
+    { id:"ragdoll", name:"ラグドール", emoji:"🧸", tags:["抱っこ好き","大型","ぬいぐるみ"], color:"#4FC3F7",
+      desc:"抱っこするとくたっとなる、まさにぬいぐるみのような猫。大きな体で甘えてくる姿はたまりません。穏やかで優しい性格は、癒しの極みです。" },
+    { id:"bengal", name:"ベンガル", emoji:"🐆", tags:["運動神経抜群","ワイルド","ツヤツヤ"], color:"#FF9A56",
+      desc:"ヒョウ柄の美しい毛並みを持つ野生の血を引く猫。運動能力が高く、一緒にアクティブな生活を楽しめます。見た目はワイルドでも、実は甘えたがり。" },
+    { id:"siamese", name:"シャム", emoji:"😼", tags:["おしゃべり","頭が良い","細身"], color:"#D4A5FF",
+      desc:"「にゃーん」とよく話しかけてくる、おしゃべり猫の代表。非常に頭が良く、あなたとのコミュニケーションを心から楽しんでくれます。寂しがりやな一面も。" },
+    { id:"mainecoon", name:"メインクーン", emoji:"🦁", tags:["貫禄","大きい","穏やか"], color:"#8B87A0",
+      desc:"猫界の巨人、でも心はとっても穏やか。堂々とした佇まいの中に、犬のような忠誠心を持っています。頼れる相棒が欲しいあなたにぴったり。" }
+  ],
+  become: [
+    { id:"black", name:"黒猫", emoji:"🐈‍⬛", tags:["ツンデレ","観察者","神秘的"], color:"#5C5470",
+      desc:"クールな外見の奥に温かい心を持つ、ミステリアスな存在。周りをよく観察してから行動する慎重派。でも心を開いた相手にはとことん甘えます。" },
+    { id:"tora", name:"茶トラ", emoji:"🐱", tags:["人懐こい","リーダー","食いしん坊"], color:"#FF9A56",
+      desc:"誰にでもフレンドリーで、みんなの人気者！食べることが大好きで、おやつの時間が最高の幸せ。ムードメーカーとしてみんなを笑顔にします。" },
+    { id:"white", name:"白猫", emoji:"🤍", tags:["気まぐれ","美人","マイペース"], color:"#E8E0F0",
+      desc:"美しく気高い、マイペースの極み。自分のペースを崩さない強さを持ちながら、ふとした瞬間に見せる甘えた表情が周りをメロメロにします。" },
+    { id:"sabi", name:"サビ猫", emoji:"🐾", tags:["自由人","個性的","意志が強い"], color:"#CD7F32",
+      desc:"独特の毛色のように、唯一無二の個性の持ち主。自由を愛し、自分の道を貫く強さがあります。ちょっと不器用な愛情表現が逆に愛おしい。" },
+    { id:"kijitora", name:"キジトラ", emoji:"🐯", tags:["野生的","用心深い","賢い"], color:"#8B6914",
+      desc:"野生の血が濃く残る、賢くて用心深い猫。最初は警戒するけれど、信頼を勝ち取れば最高の相棒に。直感が鋭く、本質を見抜く力があります。" },
+    { id:"calico", name:"三毛猫", emoji:"🎀", tags:["わがまま","愛情深い","ドラマチック"], color:"#FF6B9D",
+      desc:"気分屋でドラマチック、でもとにかく愛情深い。喜怒哀楽がはっきりしていて、一緒にいると退屈しません。女王様気質だけど、その魅力に逆らえない！" }
+  ]
+};
+
+const QUIZ_DATA = {
+  want: [
+    { q:"週末の午後、何してる？", opts:["ソファでゴロゴロ 🛋️","友達と遊ぶ 🎉","一人で趣味に没頭 🎨","特に予定なし派 😴"],
+      points:[ {scottish:3,ragdoll:2,mainecoon:1}, {munchkin:3,bengal:2,siamese:1}, {abyssinian:3,siamese:2,bengal:1}, {mix:3,ragdoll:1,mainecoon:1} ] },
+    { q:"猫に求める一番の役割は？", opts:["一緒に寝てくれる相棒 💤","話し相手になってほしい 💬","尊敬できる存在 ✨","観察して楽しみたい 👀"],
+      points:[ {ragdoll:3,scottish:2,mainecoon:1}, {siamese:3,munchkin:2,abyssinian:1}, {abyssinian:3,bengal:2,siamese:1}, {bengal:3,mix:2,abyssinian:1} ] },
+    { q:"触るならどこ？", opts:["肉球 🐾","耳の裏 👂","しっぽ付け根 🐈","お腹 💕"],
+      points:[ {munchkin:3,scottish:2,mix:1}, {abyssinian:3,siamese:2,bengal:1}, {bengal:3,mainecoon:2,mix:1}, {ragdoll:3,munchkin:2,scottish:1} ] },
+    { q:"鳴き声の好みは？", opts:["ほとんど鳴かない 🤫","よく鳴く 😺","低い声 🔊","高い声 🔔"],
+      points:[ {abyssinian:3,bengal:2,mix:1}, {siamese:3,munchkin:2,ragdoll:1}, {mainecoon:3,bengal:2,mix:1}, {scottish:3,munchkin:2,ragdoll:1} ] },
+    { q:"毛色の好みは？", opts:["白・グレー系 🤍","茶・キジ系 🧡","黒・サビ系 🖤","特にこだわらない 🌈"],
+      points:[ {ragdoll:3,scottish:2,siamese:1}, {bengal:3,munchkin:2,abyssinian:1}, {mainecoon:3,mix:2,abyssinian:1}, {mix:3,scottish:1,ragdoll:1} ] },
+    { q:"猫の年齢は？", opts:["子猫（やんちゃ）🐾","成猫（バランス）😌","シニア（落ち着き）🧓","特に問わない 🎲"],
+      points:[ {munchkin:3,bengal:2,siamese:1}, {scottish:3,abyssinian:2,ragdoll:1}, {mainecoon:3,ragdoll:2,mix:1}, {mix:3,scottish:1,abyssinian:1} ] }
+  ],
+  become: [
+    { q:"飲み会でのポジションは？", opts:["隅でスマホ 📱","幹事やってる 📋","二次会まで参加 🍻","当日キャンセル 💨"],
+      points:[ {black:3,kijitora:2,white:1}, {tora:3,calico:2,sabi:1}, {tora:2,calico:3,black:1}, {white:3,sabi:2,kijitora:1} ] },
+    { q:"ストレス発散法は？", opts:["とにかく寝る 😴","高いところに行く ⛰️","誰かに甘える 🥺","一人遊びする 🎮"],
+      points:[ {tora:3,black:2,calico:1}, {kijitora:3,black:2,sabi:1}, {calico:3,tora:2,white:1}, {sabi:3,kijitora:2,white:1} ] },
+    { q:"甘え方のタイミングは？", opts:["常にベタベタ 🐾","自分のタイミングだけ ⏰","相手による 🤔","基本甘えない 😎"],
+      points:[ {tora:3,calico:2,white:1}, {black:3,white:2,sabi:1}, {calico:3,kijitora:2,tora:1}, {kijitora:3,sabi:2,black:1} ] },
+    { q:"朝の目覚めは？", opts:["スッと起きる 🌅","二度寝は必ず 😪","起こされるまで寝る 💤","早起きからの二度寝 🔄"],
+      points:[ {kijitora:3,sabi:2,black:1}, {tora:3,calico:2,white:1}, {white:3,tora:2,calico:1}, {black:3,sabi:2,kijitora:1} ] },
+    { q:"人にどう思われたい？", opts:["クール 😎","かわいい 🥰","賢い 🧠","自由人 🦋"],
+      points:[ {black:3,kijitora:2,white:1}, {calico:3,tora:2,white:1}, {kijitora:3,black:2,sabi:1}, {sabi:3,white:2,tora:1} ] },
+    { q:"狭い場所を見つけたら？", opts:["入りたくなる！📦","なんか落ち着く 😌","閉所はムリ 🚫","特に気にしない 🤷"],
+      points:[ {black:3,tora:2,calico:1}, {kijitora:3,sabi:2,black:1}, {white:3,calico:2,tora:1}, {sabi:3,white:2,tora:1} ] }
+  ]
+};
+
+const LOG_ITEMS = [
+  { text:"日向ぼっこした", emoji:"☀️", cats:{tora:2,white:2,calico:1} },
+  { text:"伸びをしたら声が出た", emoji:"🙆", cats:{tora:3,calico:2,sabi:1} },
+  { text:"人の作業を妨害した", emoji:"😈", cats:{calico:3,black:2,tora:1} },
+  { text:"箱や袋があったら入った", emoji:"📦", cats:{black:3,kijitora:2,sabi:1} },
+  { text:"急に走り出した", emoji:"💨", cats:{kijitora:3,sabi:2,tora:1} },
+  { text:"知らない場所で寝た", emoji:"😴", cats:{white:3,sabi:2,black:1} },
+  { text:"甘えたかと思ったら離れた", emoji:"💫", cats:{black:3,white:2,calico:1} },
+  { text:"高いところに登りたくなった", emoji:"🏔️", cats:{kijitora:3,black:2,sabi:1} }
+];
+
+const ACHIEVEMENTS = [
+  { id:"first", name:"はじめてのにゃん", cond:"初回診断を完了", emoji:"🐾", check:d=>d.diagCount>0 },
+  { id:"earlybird", name:"朝日とともに", cond:"早朝(5-7時)に3日ログイン", emoji:"🌅", check:d=>d.earlyLogins>=3 },
+  { id:"boxcat", name:"段ボール市民", cond:"「箱/袋に入る」を3回記録", emoji:"📦", check:d=>(d.logCounts[3]||0)>=3 },
+  { id:"disturb", name:"飼い主支配", cond:"「作業妨害」を5回記録", emoji:"😈", check:d=>(d.logCounts[2]||0)>=5 },
+  { id:"zoomies", name:"夜の運動会", cond:"22時以降に「急に走る」を記録", emoji:"🌙", check:d=>d.nightZoomies>0 },
+  { id:"reborn", name:"転生中", cond:"7日連続ネコログ記録", emoji:"🔄", check:d=>d.streak>=7 },
+  { id:"tsundere", name:"ツンデレマスター", cond:"「甘えた→離れた」を10回", emoji:"💕", check:d=>(d.logCounts[6]||0)>=10 },
+  { id:"complete", name:"猫又見習い", cond:"全診断をコンプリート", emoji:"🐱‍👤", check:d=>d.wantCat&&d.becomeCat }
+];
+
+const COMPAT_MSGS = {
+  high: [
+    "最高の組み合わせ！あなたと猫は、前世で一緒に暮らしていたに違いない。互いの波長がぴったり合って、言葉がなくても通じ合える関係です。",
+    "これはもう運命！猫があなたを選んだのか、あなたが猫を選んだのか。どちらにせよ、この出会いは必然でした。"
+  ],
+  mid: [
+    "なかなかの相性！最初はちょっとぎこちないかもしれないけど、一緒に過ごすうちにどんどん心が通じ合うタイプ。お互いの個性を尊重し合えます。",
+    "いい感じのバランス！適度な距離感を保ちながら、大切な時はそばにいてくれる。長く付き合うほど味が出る関係です。"
+  ],
+  low: [
+    "意外な組み合わせ…だけど、だからこそ面白い！正反対だからこそ刺激し合える関係。お互いの世界を広げてくれる相棒になるはず。",
+    "ちょっとぶつかることもあるかも？でも、それが愛ってものです。時間をかけて築く絆は、誰よりも強くなります。"
+  ]
+};
+
+// ===== STATE =====
+let state = {
+  wantCat: null,
+  becomeCat: null,
+  wantScores: {},
+  becomeScores: {},
+  diagCount: 0,
+  logs: {},
+  logCounts: {},
+  achievUnlocked: [],
+  earlyLogins: 0,
+  nightZoomies: 0,
+  streak: 0,
+  lastLogDate: null
+};
+
+let currentQuiz = null;
+let currentQIndex = 0;
+let currentAnswers = [];
+
+// ===== STORAGE =====
+function saveState() {
+  try { localStorage.setItem('nekology_state', JSON.stringify(state)); } catch(e) {}
+}
+function loadState() {
+  try {
+    const s = localStorage.getItem('nekology_state');
+    if (s) state = { ...state, ...JSON.parse(s) };
+  } catch(e) {}
+}
+
+// ===== SCREENS =====
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => { s.classList.remove('active','fade-in'); });
+  const screen = document.getElementById(id);
+  screen.classList.add('active','fade-in');
+  screen.scrollTop = 0;
+  if (id === 'home') renderHome();
+  if (id === 'nekoLog') renderNekoLog();
+  if (id === 'nekogram') renderNekogram();
+  if (id === 'achievements') renderAchievements();
+  if (id === 'diagSelect') renderDiagSelect();
+}
+
+function startApp() {
+  loadState();
+  checkEarlyLogin();
+  showScreen('home');
+}
+
+function checkEarlyLogin() {
+  const h = new Date().getHours();
+  if (h >= 5 && h < 7) {
+    const today = dateKey();
+    const key = 'early_' + today;
+    if (!localStorage.getItem(key)) {
+      localStorage.setItem(key, '1');
+      state.earlyLogins = (state.earlyLogins || 0) + 1;
+      saveState();
+    }
+  }
+}
+
+function dateKey(d) {
+  const dt = d || new Date();
+  return dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0');
+}
+
+// ===== HOME =====
+function renderHome() {
+  const dailyEmoji = document.getElementById('dailyCatEmoji');
+  const dailyName = document.getElementById('dailyCatName');
+  const dailyDesc = document.getElementById('dailyCatDesc');
+  
+  if (state.becomeCat) {
+    const cat = CAT_BREEDS.become.find(c => c.id === state.becomeCat);
+    if (cat) {
+      dailyEmoji.textContent = cat.emoji;
+      dailyName.textContent = cat.name + '成分が濃いめ';
+      const msgs = [
+        '今日もマイペースに行こう 🐾',
+        '気の向くままに過ごす日 ☀️',
+        'ちょっと甘えたい気分かも？',
+        '窓際のポジションが最高の日',
+        '今日のあなたはいい感じ ✨'
+      ];
+      dailyDesc.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+    }
+  }
+  
+  // Streak
+  const streak = document.getElementById('streakBadge');
+  const streakNum = document.getElementById('streakCount');
+  if (state.streak > 0) {
+    streak.style.display = 'inline-flex';
+    streakNum.textContent = state.streak;
+  }
+  
+  // Achiev count
+  document.getElementById('achievCount').textContent = state.achievUnlocked.length + '/8 解除';
+}
+
+// ===== DIAGNOSIS SELECT =====
+function renderDiagSelect() {
+  const compat = document.getElementById('compatOption');
+  if (state.wantCat && state.becomeCat) {
+    compat.style.display = 'flex';
+  }
+}
+
+// ===== QUIZ =====
+function startQuiz(type) {
+  currentQuiz = type;
+  currentQIndex = 0;
+  currentAnswers = [];
+  showScreen('quiz');
+  renderQuiz();
+}
+
+function renderQuiz() {
+  const data = QUIZ_DATA[currentQuiz];
+  const q = data[currentQIndex];
+  
+  // Progress dots
+  const prog = document.getElementById('quizProgress');
+  prog.innerHTML = data.map((_, i) => {
+    let cls = 'quiz-dot';
+    if (i < currentQIndex) cls += ' done';
+    if (i === currentQIndex) cls += ' current';
+    return `<div class="${cls}"></div>`;
+  }).join('');
+  
+  document.getElementById('quizQnum').textContent = `Q${currentQIndex + 1} / ${data.length}`;
+  document.getElementById('quizQuestion').textContent = q.q;
+  
+  const opts = document.getElementById('quizOptions');
+  opts.innerHTML = q.opts.map((o, i) => `
+    <button class="quiz-opt" onclick="selectAnswer(${i})">
+      <span class="opt-num">${['A','B','C','D'][i]}</span>
+      <span>${o}</span>
+    </button>
+  `).join('');
+}
+
+function selectAnswer(idx) {
+  currentAnswers.push(idx);
+  
+  // Highlight
+  document.querySelectorAll('.quiz-opt').forEach((b,i) => {
+    if (i === idx) b.classList.add('selected');
+    b.style.pointerEvents = 'none';
+  });
+  
+  setTimeout(() => {
+    currentQIndex++;
+    if (currentQIndex >= QUIZ_DATA[currentQuiz].length) {
+      finishQuiz();
+    } else {
+      renderQuiz();
+    }
+  }, 400);
+}
+
+function finishQuiz() {
+  const data = QUIZ_DATA[currentQuiz];
+  const breeds = currentQuiz === 'want' ? CAT_BREEDS.want : CAT_BREEDS.become;
+  const scores = {};
+  breeds.forEach(b => scores[b.id] = 0);
+  
+  currentAnswers.forEach((ans, qi) => {
+    const pts = data[qi].points[ans];
+    if (pts) {
+      Object.entries(pts).forEach(([k,v]) => {
+        if (scores[k] !== undefined) scores[k] += v;
+      });
+    }
+  });
+  
+  // Sort
+  const sorted = Object.entries(scores).sort((a,b) => b[1] - a[1]);
+  const winner = sorted[0][0];
+  const totalPts = sorted.reduce((s,e) => s + e[1], 0) || 1;
+  
+  if (currentQuiz === 'want') {
+    state.wantCat = winner;
+    state.wantScores = scores;
+  } else {
+    state.becomeCat = winner;
+    state.becomeScores = scores;
+  }
+  state.diagCount++;
+  saveState();
+  
+  showResult(currentQuiz, winner, sorted, totalPts);
+  checkAchievements();
+}
+
+function showResult(type, winnerId, sorted, totalPts) {
+  const breeds = type === 'want' ? CAT_BREEDS.want : CAT_BREEDS.become;
+  const cat = breeds.find(b => b.id === winnerId);
+  const label = type === 'want' ? 'あなたが飼うべき猫は…' : 'あなたが猫になったら…';
+  const colors = ['#FF6B9D','#FF9A56','#FFD93D','#6BCB77','#4FC3F7','#AB83E6','#D4A5FF','#8B87A0'];
+  
+  const top = sorted.slice(0, Math.min(5, sorted.length)).filter(e => e[1] > 0);
+  
+  const barsHtml = top.map((e, i) => {
+    const b = breeds.find(x => x.id === e[0]);
+    const pct = Math.round(e[1] / totalPts * 100);
+    return `<div class="bar-item">
+      <span class="bar-label">${b ? b.emoji + ' ' + b.name : e[0]}</span>
+      <div class="bar-track"><div class="bar-fill" style="background:${colors[i]}" data-width="${pct}%"></div></div>
+      <span class="bar-pct">${pct}%</span>
+    </div>`;
+  }).join('');
+  
+  const content = document.getElementById('resultContent');
+  content.innerHTML = `
+    <div class="result-card">
+      <div class="result-label">${label}</div>
+      <div class="result-emoji">${cat.emoji}</div>
+      <div class="result-name">${cat.name}</div>
+      <div class="result-tags">${cat.tags.map(t => `<span class="result-tag">#${t}</span>`).join('')}</div>
+      <div class="result-desc">${cat.desc}</div>
+      <div class="result-bars">${barsHtml}</div>
+    </div>
+    ${state.wantCat && state.becomeCat ? `<button class="action-btn btn-accent" onclick="startCompat()">💞 相性診断を見る</button>` : ''}
+    <button class="action-btn btn-secondary" onclick="showScreen('diagSelect')">もう一度診断する</button>
+    <button class="action-btn btn-secondary" onclick="showScreen('home')">ホームに戻る</button>
+  `;
+  
+  showScreen('result');
+  spawnConfetti();
+  
+  // Animate bars
+  setTimeout(() => {
+    content.querySelectorAll('.bar-fill').forEach(bar => {
+      bar.style.width = bar.dataset.width;
+    });
+  }, 300);
+}
+
+// ===== COMPATIBILITY =====
+function startCompat() {
+  if (!state.wantCat || !state.becomeCat) {
+    showToast('先に両方の診断を完了してね！');
+    return;
+  }
+  
+  const wCat = CAT_BREEDS.want.find(c => c.id === state.wantCat);
+  const bCat = CAT_BREEDS.become.find(c => c.id === state.becomeCat);
+  
+  // Compat score based on tag overlap and special combos
+  const compatMap = {
+    'scottish+black':78, 'scottish+tora':90, 'scottish+white':72, 'scottish+sabi':60, 'scottish+kijitora':68, 'scottish+calico':82,
+    'munchkin+black':70, 'munchkin+tora':95, 'munchkin+white':65, 'munchkin+sabi':72, 'munchkin+kijitora':68, 'munchkin+calico':88,
+    'abyssinian+black':88, 'abyssinian+tora':65, 'abyssinian+white':70, 'abyssinian+sabi':82, 'abyssinian+kijitora':90, 'abyssinian+calico':60,
+    'mix+black':80, 'mix+tora':85, 'mix+white':75, 'mix+sabi':88, 'mix+kijitora':82, 'mix+calico':78,
+    'ragdoll+black':65, 'ragdoll+tora':88, 'ragdoll+white':82, 'ragdoll+sabi':58, 'ragdoll+kijitora':62, 'ragdoll+calico':90,
+    'bengal+black':82, 'bengal+tora':70, 'bengal+white':55, 'bengal+sabi':85, 'bengal+kijitora':92, 'bengal+calico':65,
+    'siamese+black':90, 'siamese+tora':72, 'siamese+white':80, 'siamese+sabi':68, 'siamese+kijitora':75, 'siamese+calico':85,
+    'mainecoon+black':75, 'mainecoon+tora':82, 'mainecoon+white':70, 'mainecoon+sabi':78, 'mainecoon+kijitora':85, 'mainecoon+calico':72
+  };
+  
+  const key = state.wantCat + '+' + state.becomeCat;
+  const score = compatMap[key] || (60 + Math.floor(Math.random() * 30));
+  
+  let msgPool;
+  if (score >= 85) msgPool = COMPAT_MSGS.high;
+  else if (score >= 70) msgPool = COMPAT_MSGS.mid;
+  else msgPool = COMPAT_MSGS.low;
+  const msg = msgPool[Math.floor(Math.random() * msgPool.length)];
+  
+  const content = document.getElementById('compatContent');
+  content.innerHTML = `
+    <div class="result-card">
+      <div class="result-label">💞 相性診断結果</div>
+      <div class="compat-pair">
+        <div class="compat-cat">
+          <span class="compat-cat-emoji">${wCat.emoji}</span>
+          <span class="compat-cat-name">${wCat.name}</span>
+        </div>
+        <span class="compat-x">×</span>
+        <div class="compat-cat">
+          <span class="compat-cat-emoji">${bCat.emoji}</span>
+          <span class="compat-cat-name">${bCat.name}</span>
+        </div>
+      </div>
+      <div class="compat-hearts">💕</div>
+      <div class="compat-score">${score}%</div>
+      <div class="compat-msg">${msg}</div>
+    </div>
+    <button class="action-btn btn-primary" onclick="showScreen('diagSelect')">もう一度診断する</button>
+    <button class="action-btn btn-secondary" onclick="showScreen('home')">ホームに戻る</button>
+  `;
+  
+  showScreen('compat');
+  spawnConfetti();
+}
+
+// ===== NEKO LOG =====
+function renderNekoLog() {
+  const today = dateKey();
+  const todayLog = state.logs[today] || new Array(LOG_ITEMS.length).fill(false);
+  
+  const d = new Date();
+  const dateStr = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}（${'日月火水木金土'[d.getDay()]}）`;
+  
+  const checksHtml = LOG_ITEMS.map((item, i) => `
+    <div class="log-check ${todayLog[i] ? 'checked' : ''}" onclick="toggleLogItem(${i})">
+      <div class="log-checkbox">${todayLog[i] ? '✓' : ''}</div>
+      <span class="log-check-text">${item.text}</span>
+      <span class="log-check-emoji">${item.emoji}</span>
+    </div>
+  `).join('');
+  
+  // Calculate today's cat ratios
+  const ratios = calcLogRatios(todayLog);
+  const ratioHtml = ratios.length > 0 ? ratios.slice(0, 3).map(r => {
+    const cat = CAT_BREEDS.become.find(c => c.id === r.id);
+    return `<div class="bar-item">
+      <span class="bar-label">${cat.emoji} ${cat.name}</span>
+      <div class="bar-track"><div class="bar-fill" style="background:${cat.color};width:${r.pct}%"></div></div>
+      <span class="bar-pct">${r.pct}%</span>
+    </div>`;
+  }).join('') : '<div style="text-align:center;color:var(--text-light);font-size:13px;padding:10px">チェックすると猫度が表示されます</div>';
+  
+  document.getElementById('logContent').innerHTML = `
+    <div class="log-date">📅 ${dateStr}</div>
+    <div class="log-checks">${checksHtml}</div>
+    <div class="log-result-card">
+      <div class="log-result-title">🐾 今日の猫度</div>
+      ${ratioHtml}
+    </div>
+    <button class="action-btn btn-primary" style="margin-top:16px" onclick="saveLog()">📝 保存する</button>
+  `;
+}
+
+function toggleLogItem(idx) {
+  const today = dateKey();
+  if (!state.logs[today]) state.logs[today] = new Array(LOG_ITEMS.length).fill(false);
+  state.logs[today][idx] = !state.logs[today][idx];
+  saveState();
+  renderNekoLog();
+}
+
+function saveLog() {
+  const today = dateKey();
+  const log = state.logs[today];
+  if (!log || !log.some(v => v)) {
+    showToast('1つ以上チェックしてにゃ！🐱');
+    return;
+  }
+  
+  // Update log counts
+  if (!state.logCounts) state.logCounts = {};
+  log.forEach((checked, i) => {
+    if (checked) state.logCounts[i] = (state.logCounts[i] || 0) + 1;
+  });
+  
+  // Night zoomies check (item index 4 = 急に走り出した)
+  const h = new Date().getHours();
+  if (h >= 22 && log[4]) {
+    state.nightZoomies = (state.nightZoomies || 0) + 1;
+  }
+  
+  // Streak
+  const yesterday = dateKey(new Date(Date.now() - 86400000));
+  if (state.lastLogDate === yesterday) {
+    state.streak++;
+  } else if (state.lastLogDate !== today) {
+    state.streak = 1;
+  }
+  state.lastLogDate = today;
+  
+  saveState();
+  checkAchievements();
+  showToast('保存しました！🐾');
+}
+
+function calcLogRatios(log) {
+  const scores = {};
+  log.forEach((checked, i) => {
+    if (checked) {
+      Object.entries(LOG_ITEMS[i].cats).forEach(([catId, pts]) => {
+        scores[catId] = (scores[catId] || 0) + pts;
+      });
+    }
+  });
+  const total = Object.values(scores).reduce((s, v) => s + v, 0) || 1;
+  return Object.entries(scores)
+    .map(([id, pts]) => ({ id, pct: Math.round(pts / total * 100) }))
+    .sort((a, b) => b.pct - a.pct);
+}
+
+// ===== NEKOGRAM =====
+function renderNekogram() {
+  const content = document.getElementById('gramContent');
+  
+  // Aggregate all log data
+  const allScores = {};
+  const logDates = Object.keys(state.logs).sort();
+  
+  if (logDates.length === 0) {
+    content.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-emoji">📊</div>
+        <div class="empty-text">まだネコログの記録がありません。<br>毎日の猫行動を記録して、<br>あなたの猫成分を解析しよう！</div>
+        <button class="action-btn btn-primary" style="margin-top:20px" onclick="showScreen('nekoLog')">📖 ネコログを記録する</button>
+      </div>
+    `;
+    return;
+  }
+  
+  logDates.forEach(date => {
+    const log = state.logs[date];
+    const ratios = calcLogRatios(log);
+    ratios.forEach(r => {
+      allScores[r.id] = (allScores[r.id] || 0) + r.pct;
+    });
+  });
+  
+  const total = Object.values(allScores).reduce((s, v) => s + v, 0) || 1;
+  const sorted = Object.entries(allScores)
+    .map(([id, pts]) => ({ id, pct: Math.round(pts / total * 100) }))
+    .sort((a, b) => b.pct - a.pct);
+  
+  const colors = ['#FF6B9D','#FF9A56','#FFD93D','#6BCB77','#4FC3F7','#AB83E6'];
+  
+  // Pie chart via canvas
+  const canvasId = 'pieChart' + Date.now();
+  
+  const legendHtml = sorted.map((r, i) => {
+    const cat = CAT_BREEDS.become.find(c => c.id === r.id);
+    return `<div class="legend-item">
+      <div class="legend-dot" style="background:${colors[i % colors.length]}"></div>
+      <span class="legend-name">${cat ? cat.emoji + ' ' + cat.name : r.id}</span>
+      <span class="legend-pct">${r.pct}%</span>
+    </div>`;
+  }).join('');
+  
+  const topCat = sorted[0];
+  const topCatData = CAT_BREEDS.become.find(c => c.id === topCat.id);
+  
+  const topHtml = sorted.slice(0, 3).map((r, i) => {
+    const cat = CAT_BREEDS.become.find(c => c.id === r.id);
+    const paws = '🐾'.repeat(Math.max(1, Math.round(r.pct / 20)));
+    return `<div class="top-cat-item">
+      <div class="top-cat-rank r${i+1}">${i+1}</div>
+      <span class="top-cat-emoji">${cat ? cat.emoji : '🐱'}</span>
+      <span class="top-cat-name">${cat ? cat.name : r.id}</span>
+      <span class="top-cat-paws">${paws}</span>
+    </div>`;
+  }).join('');
+  
+  content.innerHTML = `
+    <div class="gram-card">
+      <div class="gram-title">🎯 猫成分チャート</div>
+      <div class="chart-container">
+        <canvas id="${canvasId}" width="200" height="200" class="chart-canvas"></canvas>
+        <div class="chart-center">
+          <div class="chart-center-emoji">${topCatData ? topCatData.emoji : '🐱'}</div>
+          <div class="chart-center-pct">${topCat.pct}%</div>
+        </div>
+      </div>
+      <div class="gram-legend">${legendHtml}</div>
+    </div>
+    <div class="gram-card">
+      <div class="gram-title">🏆 猫成分ランキング</div>
+      <div class="top-cats">${topHtml}</div>
+    </div>
+    <div class="gram-card">
+      <div class="gram-title">📅 記録日数</div>
+      <div style="text-align:center;font-size:36px;font-weight:900;color:var(--pink)">${logDates.length}<span style="font-size:16px;color:var(--text-light)"> 日</span></div>
+    </div>
+  `;
+  
+  // Draw pie
+  setTimeout(() => drawPie(canvasId, sorted, colors), 100);
+}
+
+function drawPie(canvasId, data, colors) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = 200 * dpr;
+  canvas.height = 200 * dpr;
+  ctx.scale(dpr, dpr);
+  
+  const cx = 100, cy = 100, r = 80, ir = 50;
+  let start = -Math.PI / 2;
+  
+  data.forEach((d, i) => {
+    const angle = (d.pct / 100) * Math.PI * 2;
+    ctx.beginPath();
+    ctx.moveTo(cx + ir * Math.cos(start), cy + ir * Math.sin(start));
+    ctx.arc(cx, cy, r, start, start + angle);
+    ctx.arc(cx, cy, ir, start + angle, start, true);
+    ctx.closePath();
+    ctx.fillStyle = colors[i % colors.length];
+    ctx.fill();
+    start += angle;
+  });
+}
+
+// ===== ACHIEVEMENTS =====
+function renderAchievements() {
+  const content = document.getElementById('achievContent');
+  
+  const listHtml = ACHIEVEMENTS.map(a => {
+    const unlocked = state.achievUnlocked.includes(a.id);
+    return `<div class="achiev-item ${unlocked ? '' : 'locked'}">
+      <span class="achiev-icon">${a.emoji}</span>
+      <div class="achiev-info">
+        <div class="achiev-name">${a.name}</div>
+        <div class="achiev-cond">${a.cond}</div>
+      </div>
+      <span class="achiev-status">${unlocked ? '✅' : '🔒'}</span>
+    </div>`;
+  }).join('');
+  
+  content.innerHTML = `
+    <div class="achiev-summary">${state.achievUnlocked.length} / ${ACHIEVEMENTS.length} 解除済み</div>
+    <div class="achiev-list">${listHtml}</div>
+  `;
+}
+
+function checkAchievements() {
+  ACHIEVEMENTS.forEach(a => {
+    if (!state.achievUnlocked.includes(a.id) && a.check(state)) {
+      state.achievUnlocked.push(a.id);
+      saveState();
+      showToast(`🏆 実績解除！「${a.name}」`);
+    }
+  });
+}
+
+// ===== UTILS =====
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+function spawnConfetti() {
+  const container = document.createElement('div');
+  container.className = 'confetti-container';
+  document.getElementById('app').appendChild(container);
+  
+  const emojis = ['🐾','✨','💖','🐱','⭐','🎀','💫'];
+  for (let i = 0; i < 30; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    piece.style.left = Math.random() * 100 + '%';
+    piece.style.fontSize = (12 + Math.random() * 16) + 'px';
+    piece.style.animationDuration = (2 + Math.random() * 2) + 's';
+    piece.style.animationDelay = Math.random() * 0.8 + 's';
+    container.appendChild(piece);
+  }
+  setTimeout(() => container.remove(), 4000);
+}
+
+// Init
+loadState();
+</script>
+</body>
+</html>
